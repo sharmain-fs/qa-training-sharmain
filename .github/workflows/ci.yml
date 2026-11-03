@@ -1,0 +1,19 @@
+# CI scaffold, present from Day 1. It runs on every pull request.
+# Today it only checks that the repo layout is intact, so it stays green.
+# Day 9 stretch: add a "playwright" job that installs dependencies and runs the UI tests
+# (see playwright/README.md). Once that job exists, it becomes the merge gate.
+name: ci
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check repo layout
+        run: |
+          for d in sandbox test-design postman sql defects playwright; do
+            test -d "$d" || { echo "Missing folder: $d"; exit 1; }
+          done
+          echo "Layout OK"

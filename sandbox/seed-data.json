@@ -1,0 +1,400 @@
+{
+  "merchants": [
+    {
+      "id": 1,
+      "name": "Northwind Crafts"
+    },
+    {
+      "id": 2,
+      "name": "Bayside Bakery"
+    }
+  ],
+  "users": [
+    {
+      "username": "ana",
+      "password": "Ana#2026",
+      "role": "merchant_admin",
+      "merchantId": 1,
+      "note": "Northwind Crafts admin"
+    },
+    {
+      "username": "ben",
+      "password": "Ben#2026",
+      "role": "merchant_staff",
+      "merchantId": 1,
+      "note": "Northwind Crafts staff"
+    },
+    {
+      "username": "cara",
+      "password": "Cara#2026",
+      "role": "merchant_admin",
+      "merchantId": 2,
+      "note": "Bayside Bakery admin"
+    },
+    {
+      "username": "sam",
+      "password": "Sam#2026",
+      "role": "support",
+      "note": "ParcelPoint support (read-only by policy)"
+    },
+    {
+      "username": "dex",
+      "password": "Dex#2026",
+      "role": "courier",
+      "courierId": 7,
+      "note": "Courier assigned to some shipments"
+    }
+  ],
+  "shipments": [
+    {
+      "id": 1001,
+      "merchantId": 1,
+      "recipientName": "L. Reyes",
+      "city": "Cebu City",
+      "weightKg": 0.5,
+      "service": "Standard",
+      "feePhp": 120,
+      "status": "Created",
+      "courierId": null,
+      "createdAt": "2026-10-20T01:15:00.000Z",
+      "updatedAt": "2026-10-20T05:40:00.000Z"
+    },
+    {
+      "id": 1002,
+      "merchantId": 1,
+      "recipientName": "M. Santos",
+      "city": "Mandaue",
+      "weightKg": 1.2,
+      "service": "Express",
+      "feePhp": 220,
+      "status": "PickedUp",
+      "courierId": 7,
+      "createdAt": "2026-10-21T01:15:00.000Z",
+      "updatedAt": "2026-10-21T05:40:00.000Z"
+    },
+    {
+      "id": 1003,
+      "merchantId": 1,
+      "recipientName": "J. Cruz",
+      "city": "Cebu City",
+      "weightKg": 2.0,
+      "service": "SameDay",
+      "feePhp": 350,
+      "status": "InTransit",
+      "courierId": 7,
+      "createdAt": "2026-10-22T01:15:00.000Z",
+      "updatedAt": "2026-10-22T05:40:00.000Z"
+    },
+    {
+      "id": 1004,
+      "merchantId": 1,
+      "recipientName": "P. Garcia",
+      "city": "Davao City",
+      "weightKg": 4.75,
+      "service": "Standard",
+      "feePhp": 120,
+      "status": "Delivered",
+      "courierId": 7,
+      "createdAt": "2026-10-23T01:15:00.000Z",
+      "updatedAt": "2026-10-23T05:40:00.000Z"
+    },
+    {
+      "id": 1005,
+      "merchantId": 1,
+      "recipientName": "R. Flores",
+      "city": "Quezon City",
+      "weightKg": 10,
+      "service": "Express",
+      "feePhp": 220,
+      "status": "Returned",
+      "courierId": null,
+      "createdAt": "2026-10-24T01:15:00.000Z",
+      "updatedAt": "2026-10-24T05:40:00.000Z"
+    },
+    {
+      "id": 1006,
+      "merchantId": 1,
+      "recipientName": "K. Tan",
+      "city": "Cebu City",
+      "weightKg": 29.5,
+      "service": "SameDay",
+      "feePhp": 350,
+      "status": "Cancelled",
+      "courierId": null,
+      "createdAt": "2026-10-25T01:15:00.000Z",
+      "updatedAt": "2026-10-25T05:40:00.000Z"
+    },
+    {
+      "id": 1007,
+      "merchantId": 2,
+      "recipientName": "D. Lim",
+      "city": "Cebu City",
+      "weightKg": 0.5,
+      "service": "Standard",
+      "feePhp": 120,
+      "status": "Created",
+      "courierId": null,
+      "createdAt": "2026-10-20T01:15:00.000Z",
+      "updatedAt": "2026-10-20T05:40:00.000Z"
+    },
+    {
+      "id": 1008,
+      "merchantId": 2,
+      "recipientName": "S. Uy",
+      "city": "Mandaue",
+      "weightKg": 1.2,
+      "service": "Express",
+      "feePhp": 220,
+      "status": "PickedUp",
+      "courierId": 7,
+      "createdAt": "2026-10-21T01:15:00.000Z",
+      "updatedAt": "2026-10-21T05:40:00.000Z"
+    },
+    {
+      "id": 1009,
+      "merchantId": 2,
+      "recipientName": "A. Ramos",
+      "city": "Cebu City",
+      "weightKg": 2.0,
+      "service": "SameDay",
+      "feePhp": 350,
+      "status": "InTransit",
+      "courierId": 7,
+      "createdAt": "2026-10-22T01:15:00.000Z",
+      "updatedAt": "2026-10-22T05:40:00.000Z"
+    },
+    {
+      "id": 1010,
+      "merchantId": 2,
+      "recipientName": "T. Mendoza",
+      "city": "Davao City",
+      "weightKg": 4.75,
+      "service": "Standard",
+      "feePhp": 120,
+      "status": "Delivered",
+      "courierId": 7,
+      "createdAt": "2026-10-23T01:15:00.000Z",
+      "updatedAt": "2026-10-23T05:40:00.000Z"
+    },
+    {
+      "id": 1011,
+      "merchantId": 2,
+      "recipientName": "N. Bautista",
+      "city": "Quezon City",
+      "weightKg": 10,
+      "service": "Express",
+      "feePhp": 220,
+      "status": "Returned",
+      "courierId": null,
+      "createdAt": "2026-10-24T01:15:00.000Z",
+      "updatedAt": "2026-10-24T05:40:00.000Z"
+    },
+    {
+      "id": 1012,
+      "merchantId": 2,
+      "recipientName": "E. Navarro",
+      "city": "Cebu City",
+      "weightKg": 29.5,
+      "service": "SameDay",
+      "feePhp": 350,
+      "status": "Cancelled",
+      "courierId": null,
+      "createdAt": "2026-10-25T01:15:00.000Z",
+      "updatedAt": "2026-10-25T05:40:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "shipmentId": 1001,
+      "status": "Created",
+      "at": "2026-10-20T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1002,
+      "status": "Created",
+      "at": "2026-10-21T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1002,
+      "status": "PickedUp",
+      "at": "2026-10-21T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1003,
+      "status": "Created",
+      "at": "2026-10-22T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1003,
+      "status": "PickedUp",
+      "at": "2026-10-22T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1003,
+      "status": "InTransit",
+      "at": "2026-10-22T03:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1004,
+      "status": "Created",
+      "at": "2026-10-23T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1004,
+      "status": "PickedUp",
+      "at": "2026-10-23T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1004,
+      "status": "InTransit",
+      "at": "2026-10-23T03:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1004,
+      "status": "Delivered",
+      "at": "2026-10-23T04:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1005,
+      "status": "Created",
+      "at": "2026-10-24T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1005,
+      "status": "PickedUp",
+      "at": "2026-10-24T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1005,
+      "status": "InTransit",
+      "at": "2026-10-24T03:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1005,
+      "status": "Returned",
+      "at": "2026-10-24T04:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1006,
+      "status": "Created",
+      "at": "2026-10-25T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1006,
+      "status": "Cancelled",
+      "at": "2026-10-25T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1007,
+      "status": "Created",
+      "at": "2026-10-20T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1008,
+      "status": "Created",
+      "at": "2026-10-21T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1008,
+      "status": "PickedUp",
+      "at": "2026-10-21T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1009,
+      "status": "Created",
+      "at": "2026-10-22T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1009,
+      "status": "PickedUp",
+      "at": "2026-10-22T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1009,
+      "status": "InTransit",
+      "at": "2026-10-22T03:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1010,
+      "status": "Created",
+      "at": "2026-10-23T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1010,
+      "status": "PickedUp",
+      "at": "2026-10-23T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1010,
+      "status": "InTransit",
+      "at": "2026-10-23T03:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1010,
+      "status": "Delivered",
+      "at": "2026-10-23T04:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1011,
+      "status": "Created",
+      "at": "2026-10-24T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1011,
+      "status": "PickedUp",
+      "at": "2026-10-24T02:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1011,
+      "status": "InTransit",
+      "at": "2026-10-24T03:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1011,
+      "status": "Returned",
+      "at": "2026-10-24T04:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1012,
+      "status": "Created",
+      "at": "2026-10-25T01:15:00.000Z",
+      "by": "seed"
+    },
+    {
+      "shipmentId": 1012,
+      "status": "Cancelled",
+      "at": "2026-10-25T02:15:00.000Z",
+      "by": "seed"
+    }
+  ]
+}
