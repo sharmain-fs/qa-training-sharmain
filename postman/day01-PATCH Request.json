@@ -1,0 +1,17 @@
+{
+   "$kind": "http-request",
+   "name": "http://localhost:4010/shipments/1013",
+   "description": "",
+   "url": "{{baseUrl}}/shipments/1014/status",
+   "method": "PATCH",
+   "headers": {
+      "Content-Type": "application/json"
+   },
+   "body": {
+      "type": "json",
+      "content": "{\n  \"status\": \"PickedUp\"\n}",
+      "$type": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"status\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+   },
+   "settings": {},
+   "order": 4000
+}

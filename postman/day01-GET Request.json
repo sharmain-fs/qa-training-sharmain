@@ -1,0 +1,17 @@
+{
+   "$kind": "http-request",
+   "name": "http://localhost:4010/shipments/1013",
+   "description": "",
+   "url": "{{baseUrl}}/shipments/1014",
+   "method": "GET",
+   "headers": {
+      "Content-Type": "application/json"
+   },
+   "body": {
+      "type": "json",
+      "content": "{\n  \"recipientName\": \"T. Test\",\n  \"city\": \"Carcar City\",\n  \"weightKg\": 25,\n  \"service\": \"Express\"\n}",
+      "$type": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"recipientName\": {\n      \"type\": \"string\"\n    },\n    \"city\": {\n      \"type\": \"string\"\n    },\n    \"weightKg\": {\n      \"type\": \"integer\"\n    },\n    \"service\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+   },
+   "settings": {},
+   "order": 3000
+}
