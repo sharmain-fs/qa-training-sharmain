@@ -1,0 +1,234 @@
+{
+  "info": {
+    "_postman_id": "0924154a-ec98-49b3-ac8b-4dd396cd9d1f",
+    "name": "FS Learning - Day 04",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59425093",
+    "_collection_link": "https://go.postman.co/collection/59425093-0924154a-ec98-49b3-ac8b-4dd396cd9d1f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const token = pm.response.json();\r\npm.environment.set(\"token\", token.token)"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"ana\",\r\n    \"password\": \"Ana#2026\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/auth/login",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Shipments",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n})\r\n\r\npm.test(\"Return Shipment Fields\", function () {\r\n    const data = pm.response.json();\r\n    data.items.forEach((shipment) => {\r\n    pm.expect(shipment).to.have.property('id');\r\n    pm.expect(shipment).to.have.property('merchantId');\r\n    pm.expect(shipment).to.have.property('recipientName');\r\n    pm.expect(shipment).to.have.property('city');\r\n    pm.expect(shipment).to.have.property('weightKg');\r\n    pm.expect(shipment).to.have.property('service');\r\n    pm.expect(shipment).to.have.property('feePhp');\r\n    pm.expect(shipment).to.have.property('status');\r\n    pm.expect(shipment).to.have.property('courierId');\r\n    pm.expect(shipment).to.have.property('createdAt');\r\n    pm.expect(shipment).to.have.property('updatedAt'); \r\n    })\r\n})\r\n\r\npm.test(\"Response time is less than 200ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(200);\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseurl}}/shipments",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Shipment/ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Return Shipment Fields\", function () {\r\n    const shipment = pm.response.json();\r\n    pm.expect(shipment).to.have.property('id');\r\n    pm.expect(shipment).to.have.property('merchantId');\r\n    pm.expect(shipment).to.have.property('recipientName');\r\n    pm.expect(shipment).to.have.property('city');\r\n    pm.expect(shipment).to.have.property('weightKg');\r\n    pm.expect(shipment).to.have.property('service');\r\n    pm.expect(shipment).to.have.property('feePhp');\r\n    pm.expect(shipment).to.have.property('status');\r\n    pm.expect(shipment).to.have.property('courierId');\r\n    pm.expect(shipment).to.have.property('createdAt');\r\n    pm.expect(shipment).to.have.property('updatedAt'); \r\n    console.log(shipment)\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseurl}}/shipments/:id",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1013"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Shipment",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r\n    pm.response.to.have.status(201);\r\n})\r\n\r\npm.test(\"Return Shipment Fields\", function () {\r\n    const shipment = pm.response.json();\r\n    pm.expect(shipment).to.have.property('id');\r\n    pm.expect(shipment).to.have.property('merchantId');\r\n    pm.expect(shipment).to.have.property('recipientName');\r\n    pm.expect(shipment).to.have.property('city');\r\n    pm.expect(shipment).to.have.property('weightKg');\r\n    pm.expect(shipment).to.have.property('service');\r\n    pm.expect(shipment).to.have.property('feePhp');\r\n    pm.expect(shipment).to.have.property('status');\r\n    pm.expect(shipment).to.have.property('courierId');\r\n    pm.expect(shipment).to.have.property('createdAt');\r\n    pm.expect(shipment).to.have.property('updatedAt'); \r\n    console.log(shipment)\r\n})\r\n\r\npm.test(\"Check Created Shipment\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.recipientName).to.equal(\"Shaomao\");\r\n    pm.expect(data.city).to.equal(\"Cebu City\");\r\n    pm.expect(data.weightKg).to.equal(25);\r\n    pm.expect(data.service).to.equal(\"Standard\");\r\n})\r\n\r\npm.test(\"Response time is less than 200ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(200);\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"recipientName\": \"Ashley\",\r\n    \"city\": \"Davao City\",\r\n    \"weightKg\": 10, \r\n    \"service\": \"Standard\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/shipments",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Change Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n})\r\n\r\npm.test(\"Return Shipment Fields\", function () {\r\n    const shipment = pm.response.json();\r\n    pm.expect(shipment).to.have.property('id');\r\n    pm.expect(shipment).to.have.property('merchantId');\r\n    pm.expect(shipment).to.have.property('recipientName');\r\n    pm.expect(shipment).to.have.property('city');\r\n    pm.expect(shipment).to.have.property('weightKg');\r\n    pm.expect(shipment).to.have.property('service');\r\n    pm.expect(shipment).to.have.property('feePhp');\r\n    pm.expect(shipment).to.have.property('status');\r\n    pm.expect(shipment).to.have.property('courierId');\r\n    pm.expect(shipment).to.have.property('createdAt');\r\n    pm.expect(shipment).to.have.property('updatedAt'); \r\n    console.log(shipment)\r\n})\r\n\r\npm.test(\"Check If Status Change\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.status).to.equal('PickedUp');\r\n})\r\n\r\npm.test(\"Response time is less than 200ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(200);\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"PickedUp\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/shipments/1013/status",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments",
+            "1013",
+            "status"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
