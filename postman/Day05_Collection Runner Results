@@ -1,0 +1,863 @@
+{
+	"id": "1e32ce02-4433-41e9-990a-cb3374774f71",
+	"name": "FS Learning - Day 05",
+	"timestamp": "2026-11-09T08:32:41.080Z",
+	"collection_id": "59425093-5ee89a4e-7aaf-45a4-8722-1aa595d1e180",
+	"folder_id": 0,
+	"environment_id": "59425093-cb0618b4-1314-45a1-8921-1283486e18b1",
+	"totalPass": 30,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2026-11-09T08:32:38.976Z",
+	"totalFail": 7,
+	"results": [
+		{
+			"id": "72728261-9fd3-43d4-99cb-3c42f12013ba",
+			"name": "Missing Token",
+			"url": "http://localhost:4010/shipments",
+			"time": 28,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 401 Unauthorized": true
+			},
+			"testPassFailCounts": {
+				"Status code is 401 Unauthorized": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				28
+			],
+			"allTests": [
+				{
+					"Status code is 401 Unauthorized": true
+				}
+			]
+		},
+		{
+			"id": "a53e1def-0e1a-44fe-bf49-fed6c2246365",
+			"name": "Invalid Token",
+			"url": "http://localhost:4010/shipments",
+			"time": 17,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403 Forbidden": true
+			},
+			"testPassFailCounts": {
+				"Status code is 403 Forbidden": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				17
+			],
+			"allTests": [
+				{
+					"Status code is 403 Forbidden": true
+				}
+			]
+		},
+		{
+			"id": "a6f1ad46-1a77-452f-8d09-c3e3b4e240d4",
+			"name": "Login as merchant_staff",
+			"url": "http://localhost:4010/auth/login",
+			"time": 12,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				12
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "a8ba01de-1461-46f1-9093-f64f1b8fdbdb",
+			"name": "Login as merchant_admin 1",
+			"url": "http://localhost:4010/auth/login",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "464f6a9a-f8b4-4692-a962-73c7d4d4b1e2",
+			"name": "Login as merchant_admin 2",
+			"url": "http://localhost:4010/auth/login",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "20662c2a-2c55-47e5-b42f-0cbb29893281",
+			"name": "merchant_staff GET shipments",
+			"url": "http://localhost:4010/shipments",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "8e6ba6ee-4a0d-469e-9b54-82f08106551b",
+			"name": "merchant_admin 1 GET shipments",
+			"url": "http://localhost:4010/shipments",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "d6bb0bbd-7f76-4187-a64f-3e6ddb43861b",
+			"name": "merchant_admin_2 GET shipments",
+			"url": "http://localhost:4010/shipments",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Merchant ID is 2": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Merchant ID is 2": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Merchant ID is 2": true
+				}
+			]
+		},
+		{
+			"id": "a9c7f261-5d07-4493-b166-a650495c223b",
+			"name": "merchant_admin 1 reads another merchant's shipment",
+			"url": "http://localhost:4010/shipments/1007",
+			"time": 5,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Merchant Admin Cannot See Another Mechant's Shipment": true,
+				"Error Message Shipment not found": true
+			},
+			"testPassFailCounts": {
+				"Merchant Admin Cannot See Another Mechant's Shipment": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Error Message Shipment not found": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Merchant Admin Cannot See Another Mechant's Shipment": true,
+					"Error Message Shipment not found": true
+				}
+			]
+		},
+		{
+			"id": "b651454c-74c9-45d6-9f32-c752155f11dc",
+			"name": "merchant_staff reads another merchant's shipment Copy",
+			"url": "http://localhost:4010/shipments/1007",
+			"time": 21,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Merchant Staff Cannot See Another Mechant's Shipment": true,
+				"Error Message is Correct": true
+			},
+			"testPassFailCounts": {
+				"Merchant Staff Cannot See Another Mechant's Shipment": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Error Message is Correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				21
+			],
+			"allTests": [
+				{
+					"Merchant Staff Cannot See Another Mechant's Shipment": true,
+					"Error Message is Correct": true
+				}
+			]
+		},
+		{
+			"id": "7c68d3e7-94b8-43be-b1bd-91b46a73fe91",
+			"name": "merchant_staff adds new shipment",
+			"url": "http://localhost:4010/shipments",
+			"time": 6,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true,
+				"Return Shipment Fields": true,
+				"Check Created Shipment": true,
+				"Response time is less than 200ms": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Return Shipment Fields": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Check Created Shipment": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response time is less than 200ms": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Status code is 201": true,
+					"Return Shipment Fields": true,
+					"Check Created Shipment": true,
+					"Response time is less than 200ms": true
+				}
+			]
+		},
+		{
+			"id": "d4693365-bb55-4b5e-9d39-21cd9c92cde1",
+			"name": "merchant_staff GET its own shipment",
+			"url": "http://localhost:4010/shipments/1005",
+			"time": 9,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				9
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "c70b8ccb-0d11-4bd6-8207-864c44fdde35",
+			"name": "Login as support",
+			"url": "http://localhost:4010/auth/login",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "8ffa916d-e8f9-42a4-9d82-8b0836e5176e",
+			"name": "support GET shipments",
+			"url": "http://localhost:4010/shipments",
+			"time": 9,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status Code 200": true
+			},
+			"testPassFailCounts": {
+				"Status Code 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				9
+			],
+			"allTests": [
+				{
+					"Status Code 200": true
+				}
+			]
+		},
+		{
+			"id": "64c5c90f-9621-4c99-933c-f90124976859",
+			"name": "support creates shipment",
+			"url": "http://localhost:4010/shipments",
+			"time": 6,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403": true,
+				"Check if the error message is correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 403": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Check if the error message is correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Status code is 403": true,
+					"Check if the error message is correct": true
+				}
+			]
+		},
+		{
+			"id": "6135fafc-9d63-48e0-af48-b9175a3132dd",
+			"name": "Login as courier",
+			"url": "http://localhost:4010/auth/login",
+			"time": 10,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				10
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "064832d3-8c42-4c0e-a349-52732b1d326e",
+			"name": "courier GET shipments_assigned only",
+			"url": "http://localhost:4010/shipments",
+			"time": 4,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Courier Assigned Only": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Courier Assigned Only": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Courier Assigned Only": true
+				}
+			]
+		},
+		{
+			"id": "94cfb4e4-6dd9-491c-b6ce-b4bdf9c6b4cb",
+			"name": "courier creates shipment",
+			"url": "http://localhost:4010/shipments",
+			"time": 5,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403": true,
+				"Check if the error message is correct": true
+			},
+			"testPassFailCounts": {
+				"Status code is 403": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Check if the error message is correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 403": true,
+					"Check if the error message is correct": true
+				}
+			]
+		},
+		{
+			"id": "1c55bfe9-1d2b-4473-bee2-1475c175a8e3",
+			"name": "disallowed status move_PickedUp to Delivered",
+			"url": "http://localhost:4010/shipments/1007/status",
+			"time": 4,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 409": false,
+				"Check if the error message is correct": false
+			},
+			"testPassFailCounts": {
+				"Status code is 409": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Check if the error message is correct": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Status code is 409": false,
+					"Check if the error message is correct": false
+				}
+			]
+		},
+		{
+			"id": "4d001a5a-1b64-4818-8964-c5b893bb6aa9",
+			"name": "BUG_support changes Merchant A shipment status",
+			"url": "http://localhost:4010/shipments/1003/status",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 403": false,
+				"Check if the error message is correct": false
+			},
+			"testPassFailCounts": {
+				"Status code is 403": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Check if the error message is correct": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 403": false,
+					"Check if the error message is correct": false
+				}
+			]
+		},
+		{
+			"id": "b306f432-eea6-44bd-b1dd-032d7d3de7b4",
+			"name": "BUG_courier changed status to Cancelled",
+			"url": "http://localhost:4010/shipments/1010/status",
+			"time": 5,
+			"responseCode": {
+				"code": 409,
+				"name": "Conflict"
+			},
+			"tests": {
+				"Status code is 409": true,
+				"Check if the error message is correct": false
+			},
+			"testPassFailCounts": {
+				"Status code is 409": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Check if the error message is correct": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 409": true,
+					"Check if the error message is correct": false
+				}
+			]
+		},
+		{
+			"id": "74be9ef6-7006-43fd-a617-2ed1b27927f7",
+			"name": "BUG_merchant_admin 1 tampers with write shipment ID",
+			"url": "http://localhost:4010/shipments/1007/status",
+			"time": 5,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				5
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "aff4d132-6fc1-4741-b309-2e41523593ce",
+			"name": "BUG?_courier reads unassigned shipment",
+			"url": "http://localhost:4010/shipments/1012/status",
+			"time": 5,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				5
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "3101cdb6-8924-45f7-86ce-371766c4f578",
+			"name": "BUG_disallowed status move",
+			"url": "http://localhost:4010/shipments/1003/status",
+			"time": 6,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status update error status is 409 Conflict": false,
+				"Status update error message is correct": false
+			},
+			"testPassFailCounts": {
+				"Status update error status is 409 Conflict": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Status update error message is correct": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Status update error status is 409 Conflict": false,
+					"Status update error message is correct": false
+				}
+			]
+		},
+		{
+			"id": "1cb3c3cb-e787-4d8e-97d3-b07df0724700",
+			"name": "Cancelled back to InTransit",
+			"url": "http://localhost:4010/shipments/1010/status",
+			"time": 4,
+			"responseCode": {
+				"code": 409,
+				"name": "Conflict"
+			},
+			"tests": {
+				"Status update error status is 409 Conflict": true,
+				"Status update error message is correct": true
+			},
+			"testPassFailCounts": {
+				"Status update error status is 409 Conflict": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status update error message is correct": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Status update error status is 409 Conflict": true,
+					"Status update error message is correct": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 196,
+	"collection": {
+		"requests": [
+			{
+				"id": "72728261-9fd3-43d4-99cb-3c42f12013ba",
+				"method": "GET"
+			},
+			{
+				"id": "a53e1def-0e1a-44fe-bf49-fed6c2246365",
+				"method": "GET"
+			},
+			{
+				"id": "a6f1ad46-1a77-452f-8d09-c3e3b4e240d4",
+				"method": "POST"
+			},
+			{
+				"id": "a8ba01de-1461-46f1-9093-f64f1b8fdbdb",
+				"method": "POST"
+			},
+			{
+				"id": "464f6a9a-f8b4-4692-a962-73c7d4d4b1e2",
+				"method": "POST"
+			},
+			{
+				"id": "20662c2a-2c55-47e5-b42f-0cbb29893281",
+				"method": "GET"
+			},
+			{
+				"id": "8e6ba6ee-4a0d-469e-9b54-82f08106551b",
+				"method": "GET"
+			},
+			{
+				"id": "d6bb0bbd-7f76-4187-a64f-3e6ddb43861b",
+				"method": "GET"
+			},
+			{
+				"id": "a9c7f261-5d07-4493-b166-a650495c223b",
+				"method": "GET"
+			},
+			{
+				"id": "b651454c-74c9-45d6-9f32-c752155f11dc",
+				"method": "GET"
+			},
+			{
+				"id": "7c68d3e7-94b8-43be-b1bd-91b46a73fe91",
+				"method": "POST"
+			},
+			{
+				"id": "d4693365-bb55-4b5e-9d39-21cd9c92cde1",
+				"method": "GET"
+			},
+			{
+				"id": "c70b8ccb-0d11-4bd6-8207-864c44fdde35",
+				"method": "POST"
+			},
+			{
+				"id": "8ffa916d-e8f9-42a4-9d82-8b0836e5176e",
+				"method": "GET"
+			},
+			{
+				"id": "64c5c90f-9621-4c99-933c-f90124976859",
+				"method": "POST"
+			},
+			{
+				"id": "6135fafc-9d63-48e0-af48-b9175a3132dd",
+				"method": "POST"
+			},
+			{
+				"id": "064832d3-8c42-4c0e-a349-52732b1d326e",
+				"method": "GET"
+			},
+			{
+				"id": "94cfb4e4-6dd9-491c-b6ce-b4bdf9c6b4cb",
+				"method": "POST"
+			},
+			{
+				"id": "1c55bfe9-1d2b-4473-bee2-1475c175a8e3",
+				"method": "PATCH"
+			},
+			{
+				"id": "4d001a5a-1b64-4818-8964-c5b893bb6aa9",
+				"method": "PATCH"
+			},
+			{
+				"id": "b306f432-eea6-44bd-b1dd-032d7d3de7b4",
+				"method": "PATCH"
+			},
+			{
+				"id": "74be9ef6-7006-43fd-a617-2ed1b27927f7",
+				"method": "PATCH"
+			},
+			{
+				"id": "aff4d132-6fc1-4741-b309-2e41523593ce",
+				"method": "PATCH"
+			},
+			{
+				"id": "3101cdb6-8924-45f7-86ce-371766c4f578",
+				"method": "PATCH"
+			},
+			{
+				"id": "1cb3c3cb-e787-4d8e-97d3-b07df0724700",
+				"method": "PATCH"
+			}
+		]
+	}
+}
