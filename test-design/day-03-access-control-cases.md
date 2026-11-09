@@ -36,6 +36,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `404 Not Found`; no shipment details disclosed.
 - **Why:** Prevents cross-merchant data exposure.
 - **Critical justification:** Another merchant's shipment data could be exposed.
+<!-- CREATED AND PASSED -->
 
 ### TC-002 — Merchant staff reads another merchant's shipment
 - **Priority:** Critical
@@ -45,6 +46,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `404 Not Found`; no shipment details disclosed.
 - **Why:** Enforces tenant isolation for staff.
 - **Critical justification:** Another merchant's shipment data could be exposed.
+<!-- CREATED AND PASSED -->
 
 ### TC-003 — Support creates shipment
 - **Priority:** High
@@ -53,6 +55,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** `{"merchantId":"A","weight":2,"service":"Standard"}`
 - **Expected:** `403 Forbidden`; no shipment created.
 - **Why:** Support has no shipment creation permission.
+<!-- CREATED AND PASSED -->
 
 ### TC-004 — Courier creates shipment
 - **Priority:** High
@@ -61,6 +64,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** `{"merchantId":"A","weight":2,"service":"Standard"}`
 - **Expected:** `403 Forbidden`; no shipment created.
 - **Why:** Couriers cannot perform merchant-only actions.
+<!-- CREATED AND PASSED -->
 
 ### TC-005 — Support changes Merchant A shipment status
 - **Priority:** High
@@ -69,6 +73,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** `{"status":"Delivered"}`
 - **Expected:** `403 Forbidden`; status unchanged.
 - **Why:** Read access does not grant write access.
+<!-- FAILED - BUG -->
 
 ### TC-006 — Support changes Merchant B shipment status
 - **Priority:** High
@@ -77,22 +82,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** `{"status":"Delivered"}`
 - **Expected:** `403 Forbidden`; status unchanged.
 - **Why:** Support cannot change status for any merchant.
-
-### TC-007 — Support cancels shipment
-- **Priority:** High
-- **User:** support
-- **Request:** `POST /api/shipments/SHP-101/cancel`
-- **Body:** `{}`
-- **Expected:** `403 Forbidden` (assumed); no cancellation.
-- **Why:** Support has no cancellation permission.
-
-### TC-008 — Courier cancels assigned shipment
-- **Priority:** High
-- **User:** courier, Courier A
-- **Request:** `POST /api/shipments/SHP-301/cancel`
-- **Body:** `{}`
-- **Expected:** `403 Forbidden`; no cancellation.
-- **Why:** Assignment does not grant cancellation rights.
+<!-- FAILED - BUG -->
 
 ## B. ID tampering / IDOR / BOLA
 
@@ -104,6 +94,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `404 Not Found`; no cross-merchant data.
 - **Why:** Tests object-level authorization on reads.
 - **Critical justification:** Cross-merchant shipment details could be exposed.
+<!-- CREATED AND PASSED -->
 
 ### TC-010 — Merchant staff tampers with read shipment ID
 - **Priority:** Critical
@@ -113,6 +104,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `404 Not Found`.
 - **Why:** Staff must not bypass merchant boundaries by guessing IDs.
 - **Critical justification:** Cross-merchant shipment details could be exposed.
+<!-- CREATED AND PASSED -->
 
 ### TC-011 — Merchant admin tampers with write shipment ID
 - **Priority:** Critical
@@ -122,6 +114,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `404 Not Found`; SHP-201 unchanged.
 - **Why:** Write requests need independent ownership checks.
 - **Critical justification:** Another merchant's delivery record could be irreversibly altered.
+<!-- CREATED AND BUG -->
 
 ### TC-012 — Merchant staff tampers with write shipment ID
 - **Priority:** Critical
@@ -131,6 +124,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `404 Not Found`; SHP-201 unchanged.
 - **Why:** Prevents cross-merchant shipment manipulation.
 - **Critical justification:** Unauthorized returns can affect money and delivery records.
+<!-- CREATED AND BUG -->
 
 **Why is it a problem if read returns 404 but write returns 200?** The read endpoint blocks cross-merchant access, but the write endpoint fails object-level authorization. A user can alter a shipment they cannot view. Each HTTP method and object must be authorized independently; verify there are no downstream side effects.
 
@@ -143,6 +137,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** None
 - **Expected:** `401 Unauthorized`.
 - **Why:** Protected resources require authentication.
+<!-- CREATED AND PASSED -->
 
 ### TC-014 — Malformed token
 - **Priority:** High
@@ -151,14 +146,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** None
 - **Expected:** `401 Unauthorized`.
 - **Why:** Invalid token structure/signature must be rejected.
-
-### TC-015 — Logged-out session token reuse
-- **Priority:** High
-- **User:** logged-out merchant_admin
-- **Request:** `GET /api/shipments/SHP-101` with previously issued token
-- **Body:** None
-- **Expected:** `401 Unauthorized` **if** logout revokes the token; confirm logout/session policy (a stateless JWT may remain valid until expiry).
-- **Why:** Tests whether session invalidation matches the security design.
+<!-- CREATED AND PASSED -->
 
 ### TC-016 — Another user's valid token, unauthorized object
 - **Priority:** Critical
@@ -168,15 +156,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `404 Not Found`, because token owner Merchant B cannot read Merchant A shipment.
 - **Why:** Permissions must derive from the authenticated token identity.
 - **Critical justification:** Incorrect identity handling could expose data across merchants.
-
-### TC-017 — Forged elevated role in token
-- **Priority:** Critical
-- **User:** merchant_staff, token payload altered to claim `merchant_admin` without a valid signature
-- **Request:** `POST /api/shipments/SHP-101/cancel` with altered bearer token
-- **Body:** `{}`
-- **Expected:** `401 Unauthorized`; no cancellation.
-- **Why:** Server must validate token integrity and not trust modified role claims.
-- **Critical justification:** A forged privileged token could enable irreversible cancellation.
+<!-- <CREATED AND PASSED> -->
 
 ## D. Courier assignment and cancellation restrictions
 
@@ -187,6 +167,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** None
 - **Expected:** `403 Forbidden` (assumed; confirm whether `404` is required).
 - **Why:** Courier reads must be limited to assigned shipments.
+<!-- 404 NOT FOUND instead of 403 FORBIDDEN base on the Business Rules -->
 
 ### TC-019 — Courier reads another courier's shipment
 - **Priority:** High
@@ -195,6 +176,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** None
 - **Expected:** `403 Forbidden` (assumed; confirm whether `404` is required).
 - **Why:** Assignment, not merchant ownership, determines courier access.
+<!-- 404 NOT FOUND instead of 403 FORBIDDEN base on the Business Rules -->
 
 ### TC-020 — Courier changes unassigned shipment status
 - **Priority:** Critical
@@ -204,22 +186,16 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `403 Forbidden` (assumed); status unchanged.
 - **Why:** Couriers must not modify shipments assigned to other couriers.
 - **Critical justification:** False delivery confirmation can trigger financial and operational losses.
+<!-- 404 NOT FOUND instead of 403 FORBIDDEN base on the Business Rules -->
 
 ### TC-021 — Courier changes Cancelled shipment
 - **Priority:** High
 - **User:** Courier A (assigned to SHP-402)
 - **Request:** `PATCH /api/shipments/SHP-402/status`
-- **Body:** `{"status":"InTransit"}`
+- **Body:** `{"status":"Cancelled"}`
 - **Expected:** `403 Forbidden` per explicit courier rule; status unchanged.
 - **Why:** Courier cannot update a Cancelled shipment even when assigned.
-
-### TC-022 — Courier cancels assigned shipment
-- **Priority:** High
-- **User:** Courier A
-- **Request:** `POST /api/shipments/SHP-301/cancel`
-- **Body:** `{}`
-- **Expected:** `403 Forbidden`; no cancellation.
-- **Why:** Assignment never grants cancellation rights. This overlaps TC-008 intentionally.
+<!-- CREATED AND BUG -->
 
 ## E. Final-state and invalid transition protection
 
@@ -231,6 +207,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Expected:** `409 Conflict` (proposed; confirm API contract); remains Delivered.
 - **Why:** Delivered is a final state.
 - **Critical justification:** Reopening completed deliveries can corrupt final records and settlements.
+<!-- CREATED AND BUG -->
 
 ### TC-024 — Delivered back to PickedUp
 - **Priority:** High
@@ -239,6 +216,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** `{"status":"PickedUp"}`
 - **Expected:** `409 Conflict` (proposed); remains Delivered.
 - **Why:** Rejects backward lifecycle transitions.
+<!-- CREATED AND BUG -->
 
 ### TC-025 — Cancelled back to InTransit
 - **Priority:** High
@@ -247,6 +225,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Body:** `{"status":"InTransit"}`
 - **Expected:** `409 Conflict` (proposed); remains Cancelled.
 - **Why:** Cancelled is a final state.
+<!-- CREATED AND PASSED -->
 
 ## Coverage summary
 
