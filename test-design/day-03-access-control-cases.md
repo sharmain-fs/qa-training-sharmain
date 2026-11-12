@@ -4,25 +4,29 @@
 **Techniques:** Authorization matrix testing, negative testing, IDOR/BOLA, token validation, state transition testing.  
 **Total:** 21 cases (9 Critical, 12 High).
 
-## Assumptions and test data
+## Test data
 
-These endpoints are illustrative; confirm actual API paths and response contracts before execution.
+## Users
 
-| Action | Assumed endpoint |
-|---|---|
-| Read shipment | `GET /api/shipments/{id}` |
-| Create shipment | `POST /api/shipments` |
-| Change status | `PATCH /api/shipments/{id}/status` |
-| Cancel shipment | `POST /api/shipments/{id}/cancel` |
+| User | Password | Role | Merchant |
+|---|---|---|---|
+| ana | Ana#2026 | merchant_admin | 1 (Northwind Crafts) |
+| ben | Ben#2026 | merchant_staff | 1 (Northwind Crafts) |
+| cara | Cara#2026 | merchant_admin | 2 (Bayside Bakery) |
+| sam | Sam#2026 | support | read-only by policy |
+| dex | Dex#2026 | courier (id 7) | sees only shipments assigned to courier 7 |
 
-| Shipment | Setup |
-|---|---|
-| SHP-101 | Merchant A, InTransit, not assigned to Courier A |
-| SHP-201 | Merchant B, InTransit |
-| SHP-301 | Merchant A, assigned to Courier A, InTransit |
-| SHP-302 | Merchant B, assigned to Courier B, InTransit |
-| SHP-401 | Merchant A, Delivered |
-| SHP-402 | Merchant A, Cancelled, assigned to Courier A |
+## Endpoints
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/health` | No token needed |
+| POST | `/auth/login` | Body `{"username","password"}` → `{"token","role","merchantId"}` |
+| GET | `/shipments` | Shipments you are allowed to see. Optional `?status=Delivered` |
+| POST | `/shipments` | Create. Body `{"recipientName","city","weightKg","service"}` |
+| GET | `/shipments/{id}` | One shipment |
+| GET | `/shipments/{id}/events` | Tracking history |
+| PATCH | `/shipments/{id}/status` | Body `{"status": "PickedUp"}` |
 
 Unless stated otherwise, requests include `Authorization: Bearer <role-specific-token>`. All requests use JSON where a body is shown. `401` for missing/invalid authentication and `403` for forbidden actions are assumed defaults. Courier read denials and invalid-state response codes need confirmation. A valid token from a different user is evaluated as *that token owner's identity*, not automatically rejected.
 
@@ -106,24 +110,28 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **Critical justification:** Cross-merchant shipment details could be exposed.
 
 
-### TC-009 — Merchant admin tampers with write shipment ID
+### TC-009 — Merchant Admin Cannot Enumerate Shipment IDs
 - **Priority:** Critical
 - **User:** merchant_admin, Merchant A
-- **Request:** `PATCH /api/shipments/SHP-201/status` (replace `SHP-101`)
-- **Body:** `{"status":"Delivered"}`
-- **Expected:** `404 Not Found`; SHP-201 unchanged.
-- **Why:** Write requests need independent ownership checks.
-- **Critical justification:** Another merchant's delivery record could be irreversibly altered.
+- **Precondition:** SHP-201 belongs to Merchant B; SHP-999 does not exist.
+- **Request 1:** `GET /api/shipments/SHP-201`
+- **Request 2:** `GET /api/shipments/SHP-999`
+- **Body:** None
+- **Expected:** Both requests return `404 Not Found` with identical response bodies and no shipment details disclosed.
+- **Why:** Verify that the API does not reveal whether a shipment belongs to another merchant or does not exist.
+- **Critical justification:** Different responses could allow attackers to enumerate valid shipment IDs and identify other merchants' shipments.
 
 
-### TC-010 — Merchant staff tampers with write shipment ID
+### TC-010 — Merchant Staff Cannot Enumerate Shipment IDs
 - **Priority:** Critical
 - **User:** merchant_staff, Merchant A
-- **Request:** `PATCH /api/shipments/SHP-201/status` (replace `SHP-101`)
-- **Body:** `{"status":"Returned"}`
-- **Expected:** `404 Not Found`; SHP-201 unchanged.
-- **Why:** Prevents cross-merchant shipment manipulation.
-- **Critical justification:** Unauthorized returns can affect money and delivery records.
+- **Precondition:** SHP-201 belongs to Merchant B; SHP-999 does not exist.
+- **Request 1:** `GET /api/shipments/SHP-201`
+- **Request 2:** `GET /api/shipments/SHP-999`
+- **Body:** None
+- **Expected:** Both requests return `404 Not Found` with identical response bodies and no shipment details disclosed.
+- **Why:** Verify that merchant staff cannot determine which shipment IDs exist outside their authorized access.
+- **Critical justification:** Exposing valid shipment IDs could help attackers identify and target shipments belonging to other merchants.
 
 
 **Why is it a problem if read returns 404 but write returns 200?** The read endpoint blocks cross-merchant access, but the write endpoint fails object-level authorization. A user can alter a shipment they cannot view. Each HTTP method and object must be authorized independently; verify there are no downstream side effects.
@@ -165,7 +173,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **User:** Courier A
 - **Request:** `GET /api/shipments/SHP-101`
 - **Body:** None
-- **Expected:** `404 Not Found` (assumed; confirm whether `404` is required).
+- **Expected:** `404 Not Found`
 - **Why:** Courier reads must be limited to assigned shipments.
 
 
@@ -174,7 +182,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **User:** Courier A
 - **Request:** `GET /api/shipments/SHP-302`
 - **Body:** None
-- **Expected:** `404 Not Found` (assumed; confirm whether `404` is required).
+- **Expected:** `404 Not Found`
 - **Why:** Assignment, not merchant ownership, determines courier access.
 
 
@@ -183,7 +191,7 @@ Unless stated otherwise, requests include `Authorization: Bearer <role-specific-
 - **User:** Courier A
 - **Request:** `PATCH /api/shipments/SHP-302/status`
 - **Body:** `{"status":"Delivered"}`
-- **Expected:** `404 Not Found` (assumed); status unchanged.
+- **Expected:** `404 Not Found`
 - **Why:** Couriers must not modify shipments assigned to other couriers.
 - **Critical justification:** False delivery confirmation can trigger financial and operational losses.
 
