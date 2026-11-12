@@ -27,19 +27,19 @@
 **Then** the system displays only available 2-hour slots between 08:00 and 18:00, Monday through Saturday, and prevents Sunday bookings.
 
 ### AC-04 — Merchant Local Time Zone
-**Given** the merchant has a configured local time zone  
-**When** the merchant views or selects a pickup schedule  
-**Then** the system displays dates and slots in that time zone and preserves the correct scheduled time in the booking.
+**Given** the merchant is located in Manila, Philippines, with a configured time zone of UTC+8  
+**When** the merchant selects a pickup schedule for November 15, 2026, at 10:00 AM  
+**Then** the system displays the pickup schedule as November 15, 2026, at 10:00 AM (Manila time) and stores the equivalent UTC time (November 15, 2026, at 2:00 AM) in the booking.
 
 ### AC-05 — Successfully Cancel a Batch Pickup
 **Given** the merchant has a confirmed batch pickup and its slot starts more than 1 hour from now  
 **When** the merchant cancels the batch pickup  
 **Then** the system cancels the entire batch, updates its status to "Cancelled", and displays confirmation.
 
-### AC-06 — Prevent Late Batch Cancellation
-**Given** the merchant has a confirmed batch pickup and its slot starts in less than 1 hour  
+### AC-06 — Validate 1-Hour Pickup Cancellation Cutoff
+**Given** merchant has a confirmed pickup scheduled for 11:00 AM 
 **When** the merchant attempts to cancel the batch pickup  
-**Then** the system rejects cancellation, retains the booking, and explains that the cancellation deadline has passed.
+**Then** the system allows cancellation if at least 60 minutes remain before the scheduled pickup time and rejects cancellation if less than 60 minutes remain.
 
 ### AC-07 — Booking Confirmation and Details
 **Given** the merchant has successfully scheduled a batch pickup  
@@ -50,6 +50,16 @@
 **Given** the merchant has already scheduled a pickup for selected parcels  
 **When** the merchant submits the same booking request again  
 **Then** the system prevents duplicate active bookings for those parcels and displays an explanatory message.
+
+### AC-09 — Reject Entire Batch When One or More Parcels Are Invalid
+**Given** the merchant has a batch containing one or more invalid parcels  
+**When** the merchant submits the batch for booking  
+**Then** the system rejects the entire batch without booking any parcels and displays the invalid parcels with their specific reasons.
+
+### AC-10 — Validate Mixed Courier Services in Batch Booking
+**Given** the merchant has a batch containing parcels with different courier services (Standard and Express)  
+**When** the merchant submits the batch for booking  
+**Then** the system allows the booking only if the pickup requirements are compatible; otherwise, it rejects the batch and displays the reason.
 
 ## 2. Assumptions and Questions Log
 
@@ -100,22 +110,19 @@
 
 Hi [PO's Name],
 
-I've drafted 8 acceptance criteria below for PP-520 Batch Pickup Scheduling based on the existing single-pickup functionality.
+I've drafted 10 acceptance criteria below for PP-520 Batch Pickup Scheduling based on the existing single-pickup functionality.
 
 The criteria cover batch size, mixed services, invalid parcels, pickup schedules, time zones, cancellation rules, booking confirmation, and duplicate prevention.
 
-Before finalizing, could you please confirm these acceptance criteria?
+Before finalizing, could you please confirm these three decisions?
 
-1. AC-01: Successfully schedule a batch pickup
-2. AC-02: Maximum number of parcels per batch
-3. AC-03: Available pickup dates and time slots
-4. AC-04: Pickup scheduling based on merchant local time zone
-5. AC-05: Successfully cancel a batch pickup
-6. AC-06: Prevent late batch pickup cancellation
-7. AC-07: Booking confirmation and batch details
-8. AC-08: Prevent duplicate batch pickup bookings
+1. Invalid parcels: Reject the entire batch if any parcel is invalid, displaying the affected parcels and reasons?
+2. Mixed services: Allow Standard and Express in the same batch only when pickup requirements are compatible?
+3. Cancellation cutoff: Allow cancellation at exactly 60 minutes before pickup, but reject requests made with less than 60 minutes remaining?
 
-Please provide confirmation or changes by **November 10, 2026, at 5:00 PM ET**. You may leave feedback directly in the ticket so we can finalize the criteria and tests.
+Proposed default if no reply: We will proceed with the above assumptions for test design, mark them as pending PO confirmation, and avoid treating them as approved requirements.
+
+Please confirm or suggest changes in the ticket by **November 13, 2026, at 5:00 PM ET**.
 
 Thank you!
 
