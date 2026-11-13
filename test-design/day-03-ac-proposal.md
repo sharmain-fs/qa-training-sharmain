@@ -19,7 +19,7 @@
 ### AC-02 — Maximum Number of Parcels per Batch
 **Given** the merchant is creating a batch pickup  
 **When** the merchant selects more than the confirmed maximum number of parcels (default: 50)  
-**Then** the system prevents the booking and displays: "A maximum of 50 parcels is allowed per batch pickup."
+**Then** the system prevents the booking and displays: "A maximum of {max} parcels is allowed per batch pickup."
 
 ### AC-03 — Available Pickup Time Slots
 **Given** the merchant is selecting a pickup schedule  
@@ -33,8 +33,8 @@
 
 ### AC-05 — Merchant Local Time Zone
 **Given** the merchant is located in Manila, Philippines, with a configured time zone of UTC+8  
-**When** the merchant selects a pickup schedule for November 15, 2026, at 10:00 AM  
-**Then** the system displays the pickup schedule as November 15, 2026, at 10:00 AM (Manila time) and stores the equivalent UTC time (November 15, 2026, at 2:00 AM) in the booking.
+**When** the merchant selects a pickup schedule for Monday, November 16, 2026, at 10:00 AM  
+**Then** the system displays the pickup schedule as November 16, 2026, at 10:00 AM (Manila time) and stores the equivalent UTC time (November 16, 2026, at 2:00 AM) in the booking.
 
 ### AC-06 — Successfully Cancel a Batch Pickup
 **Given** the merchant has a confirmed batch pickup and its slot starts 60 minutes or more from now
@@ -62,16 +62,18 @@
 **Then** the system rejects the entire batch without booking any parcels and displays the invalid parcels with their specific reasons.
 
 ### AC-11 — Validate Mixed Courier Services in Batch Booking
-**Given** the merchant has a batch containing parcels with different courier services (Standard and Express)  
+**Given** the merchant has a batch containing parcels with different courier services  
 **When** the merchant submits the batch for booking  
-**Then** the system allows the booking only if the pickup requirements are compatible; otherwise, it rejects the batch and displays the reason.
+**Then** the system allows the booking if the batch contains Standard and Express parcels together  
+**And** rejects the entire batch if SameDay parcels are combined with Standard or Express parcels  
+**And** displays a validation message identifying the SameDay parcels that caused the rejection.
 
 ## 2. Assumptions and Questions Log
 
 | # | Question or Assumption | Why It Matters (Risk if Wrong) | Proposed Default | Owner | Status |
 |---|---|---|---|---|---|
 | 1 | What is the maximum number of parcels allowed in one batch? | Large batches may cause performance issues or exceed courier capacity. | Maximum of 50 parcels per batch. | Product Owner | Pending Confirmation |
-| 2 | Can Standard, Express, and SameDay services be included in the same batch pickup? | Mixing services with different pickup requirements may cause scheduling conflicts, missed pickups, or delivery delays. | Allow Standard and Express together in one batch. SameDay must be booked in a separate batch and cannot be mixed with Standard or Express. | Product Owner | Pending Confirmation |
+| 2 | Can Standard and Express parcels be combined in one batch, while SameDay parcels must be booked separately? | Undefined service-mixing rules may cause incorrect batch acceptance or rejection and scheduling conflicts. | Allow Standard and Express parcels together. Reject batches combining SameDay with Standard or Express, and display a validation message identifying the SameDay parcels. | Product Owner | Pending Confirmation |
 | 3 | What happens if one parcel in the batch is invalid? | Partial bookings may cause confusion, missing parcels, or inconsistent records. | Reject the entire batch and display invalid parcels with reasons. | Product Owner | Pending Confirmation |
 | 4 | Should batch pickups follow the same available days and time slots as single pickups? | Incorrect scheduling may result in unavailable couriers or missed pickups. | Monday–Saturday, 08:00–18:00, in 2-hour slots. | Product Owner | Based on Existing Feature — Verify |
 | 5 | Which time zone should be used for pickup scheduling? | Incorrect time zones may cause missed pickups and customer complaints. | Use the merchant's configured local time zone. | Product Owner | Pending Confirmation |
@@ -82,9 +84,6 @@
 | 10 | Can a merchant submit a batch pickup with no parcels selected? | Empty bookings may create invalid records and unnecessary processing. | Require at least one valid parcel before booking. | Product Owner | Pending Confirmation |
 | 11 | What happens if courier capacity becomes unavailable during booking? | Overbooking may result in failed or missed pickups. | Reject the booking and ask the merchant to select another available slot. | Product Owner | Pending Confirmation |
 | 12 | What happens if a network interruption occurs during booking? | The merchant may retry and accidentally create duplicate bookings. | Verify the booking outcome and prevent duplicate creation on retry. | Product Owner / Engineering | Pending Confirmation |
-| 13 | Can a merchant submit a batch pickup with zero parcels? | Allowing empty batches may create invalid bookings and waste system resources. | Reject batches with zero parcels and display a validation message. | Product Owner | Pending Confirmation |
-| 14 | What should happen if courier capacity becomes unavailable during batch booking? | The system may confirm pickups without available couriers, resulting in scheduling conflicts and failed pickups. | Reject the entire batch, display a capacity-unavailable message, and allow the merchant to select another available slot. | Product Owner / Operations | Pending Confirmation |
-| 15 | What should happen if a network interruption occurs during batch booking? | The merchant may not know whether the booking succeeded, potentially causing duplicate bookings or inconsistent records. | Ensure booking requests are idempotent, prevent duplicate bookings, and allow the merchant to safely retry or check the booking status. | Product Owner / Engineering | Pending Confirmation |
 
 ## 3. Traceability
 
@@ -94,20 +93,29 @@
 | TC-002 | Verify a unique batch pickup reference number is generated | AC-01 | Mapped |
 | TC-003 | Verify booking with exactly 50 parcels is successful | AC-02 | Mapped |
 | TC-004 | Verify booking with more than 50 parcels is rejected | AC-02 | Mapped |
-| TC-005 | Verify mixed Standard and Express parcels can be booked when compatible | AC-10 | Mapped |
+| TC-005 | Verify mixed Standard and Express parcels can be booked | AC-11 | Mapped |
 | TC-006 | Verify available 2-hour pickup slots between 08:00 and 18:00 | AC-03 | Mapped |
-| TC-007 | Verify batch pickup scheduling is unavailable on Sundays | AC-03 | Mapped |
+| TC-007 | Verify batch pickup scheduling is unavailable on Sundays | AC-04 | Mapped |
 | TC-008 | Verify unavailable or past pickup slots cannot be selected | AC-03 | Mapped (past-slot rule needs clarification) |
-| TC-009 | Verify pickup slots are displayed in the merchant's local time zone | AC-04 | Mapped |
-| TC-010 | Verify the selected pickup time is preserved correctly after booking | AC-04 | Mapped |
-| TC-011 | Verify successful cancellation more than 1 hour before pickup | AC-05 | Mapped |
-| TC-012 | Verify cancellation updates the entire batch status to Cancelled | AC-05 | Mapped |
-| TC-013 | Verify cancellation is allowed exactly 1 hour before pickup | AC-05 | Mapped (boundary assumption) |
-| TC-014 | Verify cancellation is rejected less than 1 hour before pickup | AC-06 | Mapped |
-| TC-015 | Verify booking confirmation displays batch reference and parcel details | AC-07 | Mapped |
-| TC-016 | Verify booking confirmation displays pickup date, slot, time zone, and status | AC-07 | Mapped |
-| TC-017 | Verify duplicate booking requests do not create additional pickups | AC-08 | Mapped |
-| TC-018 | Verify parcels with active pickup bookings cannot be booked again | AC-08 | Mapped |
+| TC-009 | Verify pickup slots are displayed in the merchant's local time zone | AC-05 | Mapped |
+| TC-010 | Verify the selected pickup time is preserved correctly after booking | AC-05 | Mapped |
+| TC-011 | Verify successful cancellation more than 1 hour before pickup | AC-06 | Mapped |
+| TC-012 | Verify cancellation updates the entire batch status to Cancelled | AC-06 | Mapped |
+| TC-013 | Verify cancellation is allowed exactly 1 hour before pickup | AC-06 | Mapped |
+| TC-014 | Verify cancellation is rejected less than 1 hour before pickup | AC-07 | Mapped |
+| TC-015 | Verify booking confirmation displays batch reference and parcel details | AC-08 | Mapped |
+| TC-016 | Verify booking confirmation displays pickup date, slot, time zone, and status | AC-08 | Mapped |
+| TC-017 | Verify duplicate booking requests do not create additional pickups | AC-09 | Mapped |
+| TC-018 | Verify parcels with active pickup bookings cannot be booked again | AC-09 | Mapped |
+| TC-019 | Verify entire batch is rejected when one parcel is invalid | AC-10 | Mapped |
+| TC-020 | Verify invalid parcels and their specific rejection reasons are displayed | AC-10 | Mapped |
+| TC-021 | Verify SameDay and Standard parcels cannot be booked together | AC-11 | Mapped |
+| TC-022 | Verify SameDay and Express parcels cannot be booked together | AC-11 | Mapped |
+| TC-023 |Verify Standard, Express, and SameDay parcels cannot be booked together | AC-11 | Mapped |
+| TC-024 | Verify Manila pickup time is correctly converted to UTC when stored | AC-05 | Mapped |
+| TC-025 | Verify batch pickup booking with zero parcels is rejected | None | Gap: test without AC |
+| TC-026 | Verify batch pickup is rejected when courier capacity becomes unavailable | None | Gap: test without AC |
+| TC-027 | Verify network interruption does not create duplicate batch pickup bookings | None | Gap: test without AC |
 
 
 ## 4. Message to the Product Owner
@@ -116,7 +124,7 @@
 
 Hi [PO's Name],
 
-I've drafted 10 acceptance criteria below for PP-520 Batch Pickup Scheduling based on the existing single-pickup functionality.
+I've drafted 11 acceptance criteria below for PP-520 Batch Pickup Scheduling based on the existing single-pickup functionality.
 
 The criteria cover batch size, mixed services, invalid parcels, pickup schedules, time zones, cancellation rules, booking confirmation, and duplicate prevention.
 
