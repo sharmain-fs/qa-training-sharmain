@@ -2,6 +2,28 @@
 
 -- PART 1 - Sign-off checks that can actually fail (about 90 minutes)
 
+-- =====================================================
+-- Day 7: Teammate Query - SMS Scheduling Validation
+-- =====================================================
+
+-- Business Rule:
+-- Eligible shipments must have one SMS notification
+-- scheduled exactly 2 hours before window_start_utc.
+
+-- Teammate's validation approach (illustrative):
+SELECT s.id AS shipment_id,
+       n.id AS notification_id,
+       s.window_start_utc,
+       n.scheduled_at_utc
+FROM shipments s
+INNER JOIN notifications n
+    ON s.id = n.shipment_id
+WHERE n.channel = 'SMS'
+  AND n.scheduled_at_utc =
+      datetime(s.window_start_utc, '-2 hours');
+
+-- Observed result from teammate query: 263 rows
+
 -- PART 1.2a: shipments that should have an SMS but have none
 SELECT s.id AS shipment_id, s.status, s.recipient_tz
 FROM shipments s
@@ -99,7 +121,7 @@ WHERE merchant_id = 2 AND status = 'Delivered'
 -- and delivered on Manila calendar day Nov 7, based on delivered_at_utc.
 SELECT COUNT(*) AS manila_delivered_count
 FROM shipments
-WHERE merchant_id = 2 AND status = 'Delivered' AND is_deleted = 0
+WHERE merchant_id = 2 AND LOWER(status) = 'delivered' AND is_deleted = 0
   AND delivered_at_utc >= '2026-11-06 16:00:00'
   AND delivered_at_utc < '2026-11-07 16:00:00';
 
@@ -107,11 +129,11 @@ WHERE merchant_id = 2 AND status = 'Delivered' AND is_deleted = 0
 -- Rows returned indicate a different shipment set, even if totals match.
 WITH old_ids AS (
   SELECT id FROM shipments
-  WHERE merchant_id = 2 AND status = 'Delivered' AND is_deleted = 0
+  WHERE merchant_id = 2 AND LOWER(status) = 'delivered' AND is_deleted = 0
     AND date(delivered_at_utc) = '2026-11-07'
 ), corrected_ids AS (
   SELECT id FROM shipments
-  WHERE merchant_id = 2 AND status = 'Delivered' AND is_deleted = 0
+  WHERE merchant_id = 2 AND LOWER(status) = 'delivered' AND is_deleted = 0
     AND delivered_at_utc >= '2026-11-06 16:00:00'
     AND delivered_at_utc < '2026-11-07 16:00:00'
 )
@@ -124,10 +146,10 @@ ORDER BY membership, shipment_id;
 
 -- Extra: summarize count and overlap for dashboard vs corrected membership.
 WITH old_ids AS (
-  SELECT id FROM shipments WHERE merchant_id = 2 AND status = 'Delivered'
+  SELECT id FROM shipments WHERE merchant_id = 2 AND LOWER(status) = 'delivered'
     AND is_deleted = 0 AND date(delivered_at_utc) = '2026-11-07'
 ), corrected_ids AS (
-  SELECT id FROM shipments WHERE merchant_id = 2 AND status = 'Delivered'
+  SELECT id FROM shipments WHERE merchant_id = 2 AND LOWER(status) = 'delivered'
     AND is_deleted = 0 AND delivered_at_utc >= '2026-11-06 16:00:00'
     AND delivered_at_utc < '2026-11-07 16:00:00'
 )

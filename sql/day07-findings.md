@@ -4,7 +4,16 @@
 
 ### 1. Proposed sign-off query
 
-**Observed: 263 rows.** This query is not a reliable validation check because it only returns notifications scheduled exactly 2 hours before the delivery window. It does not identify shipments with missing SMS notifications, incorrectly scheduled SMS notifications, or duplicate SMS notifications.Therefore, even if the query returns matching rows or zero rows, it cannot reliably determine whether the business rule has passed or failed.
+**Observed: 263 rows.** This query is not a reliable validation check because it only returns SMS notifications that already satisfy the business rule.
+
+There are two reasons why the query cannot reliably detect failures:
+
+1. **WHERE clause:** The condition only includes SMS notifications scheduled exactly 2 hours before the delivery window. Incorrectly scheduled notifications are excluded instead of being identified as failures.
+2. **INNER JOIN:** The query only includes shipments with matching SMS notifications. Shipments with missing SMS notifications are excluded entirely, so missing notifications are never detected.
+
+As a result, **"Rows returned = PASS" is true for any dataset containing at least one correctly scheduled SMS**, even if other shipments have missing, incorrectly scheduled, or duplicate notifications.
+
+Therefore, the observed 263 rows only confirm that 263 matching records satisfy the scheduling condition. They do not prove that all eligible shipments have exactly one correctly scheduled SMS notification. Therefore, the query cannot reliably determine whether the business rule has passed or failed.
 
 ### 2–3. Replacement checks (zero returned rows = PASS)
 
@@ -24,7 +33,20 @@
 | 265 | America/Chicago | 221 | +14 |
 | 266 | America/Chicago | 222 | +14 |
 
-**Hypothesis:** All five wrongly scheduled SMS notifications target recipients in `America/Chicago` and are **14 hours later** than the required UTC time (`window_start_utc` minus two hours). This strongly suggests that the scheduling path for this recipient timezone is mishandling local-to-UTC conversion or mixing time-zone offsets when saving `scheduled_at_utc`. The consistent 14-hour error indicates a systematic calculation problem rather than random delay. However, Chicago's UTC offset alone is not 14 hours, so the evidence does **not** prove that a single Chicago offset was mistakenly applied; the code and intermediate timestamps need inspection to establish the precise cause.
+**Hypothesis:** The SMS scheduler may be incorrectly applying the Manila time-zone offset (UTC+8) instead of the recipient's `America/Chicago` time zone (UTC-6 in November), resulting in notifications being scheduled 14 hours later than expected.
+
+**Time-Zone Calculation:**
+- Manila: UTC+8
+- Chicago (November): UTC-6
+- Offset difference: +8 - (-6) = **14 hours**
+
+The consistent +14-hour scheduling error across all five affected shipments suggests a systematic time-zone conversion issue rather than a random delay. However, the scheduler code must be inspected to confirm the cause and direction of the incorrect offset.
+
+**Additional Verification:**
+- **America/Chicago:** 5 of 52 eligible shipments have incorrectly scheduled SMS notifications; 47 are correct.
+- **Asia/Manila:** 0 of 218 eligible shipments have scheduling errors; all 218 are correct.
+- Compare the five affected Chicago shipments to identify shared characteristics, such as service type, shipment status, and delivery window time.
+- Inspect the scheduler code and intermediate timestamps to confirm whether the Manila offset is incorrectly applied instead of `recipient_tz`.
 
 ### 5. Additional tracking-events check
 
@@ -47,9 +69,9 @@ Manila's **Saturday, 2026-11-07** runs from **2026-11-06 16:00:00 UTC (inclusive
 
 ### 3. Which number is correct?
 
-**Both 12 and 17 are reproducible, but they describe different populations.** The dashboard's original SQL returns **12** active, exactly-capitalized `Delivered` rows in the **UTC** calendar day. Correcting *only the timezone* to Manila also returns **12** active, exactly-capitalized `Delivered` rows, although not the same 12 shipments. Counting **all 17 rows with delivery timestamps during the Manila calendar day**, regardless of status capitalization or soft-deletion, reproduces the merchant's **17**. A case-insensitive count **excluding deleted shipments** is **15**.
+The correct dashboard count is 15 delivered shipments, using the Manila calendar day, case-insensitive status matching, and excluding soft-deleted records. The count of 12 results from UTC and exact-case filtering, while 17 incorrectly includes two soft-deleted shipments.
 
-**Decision:** The database verifies **17 timestamped local-day delivery records**, but cannot by itself establish whether the dashboard should count soft-deleted rows. Under the dashboard's currently expressed business filters (`status = 'Delivered'`, `is_deleted = 0`), the corrected Manila-day count is **12**. If the metric is intended to include all delivered parcels, including soft-deleted historical records and lowercase `delivered`, the count is **17**. The Product Owner should confirm the deletion policy and status-normalization rule before approving a definitive dashboard metric.
+**PO Follow-up:** Confirm whether legacy lowercase `delivered` status values should be normalized to `Delivered` in the database to maintain data consistency and prevent future reporting discrepancies.
 
 ### 4. Same shipments or just the same total?
 
@@ -65,7 +87,11 @@ This proves a genuine date-boundary bug even though the two totals happen to be 
 
 > Hello Bayside Bakery team,
 >
-> Thank you for reporting the difference. We checked the shipment records and confirmed 17 deliveries recorded on 7 November in Manila time. The dashboard shows 12 because its date filter uses a different time zone, and its rules also exclude three records with differently capitalized statuses and two deleted records. We also found that the date issue can show the wrong shipments even when the total remains 12. We're confirming whether deleted shipments should be included in this tile before updating the figure. We'll correct the date handling and review the counting rules.
+> Thank you for reporting the discrepancy. After reviewing the shipment records, we confirmed that the correct delivery count for November 7 (Manila time) is 15 shipments.
+
+The dashboard displayed 12 because it used an incorrect date boundary, including three shipments from the wrong day while excluding three from the correct day. It also missed three valid deliveries. Your reported count of 17 includes two records that have since been removed.
+
+We are targeting Monday, November 23, 2026, to correct the dashboard's date handling and delivery count. We will confirm this timeline with our development team and notify you once the fix has been deployed and verified.
 >
 > Thank you for bringing this to our attention.
 
@@ -75,7 +101,7 @@ This proves a genuine date-boundary bug even though the two totals happen to be 
 
 **Severity:** Medium — inaccurate customer-facing delivery metrics and shipment membership.
 
-**Priority:** High — customer-reported and reproducible; fix before reporting sign-off.
+**Proposed Priority:** High (merchant-visible data); to confirm with PO.
 
 **Preconditions:** Merchant 2 (`Bayside Bakery`) timezone is `Asia/Manila`; test date 2026-11-07; populated `parcelpoint(1).db`.
 
