@@ -1,0 +1,2168 @@
+{
+  "info": {
+    "_postman_id": "5ee89a4e-7aaf-45a4-8722-1aa595d1e180",
+    "name": "FS Learning - Day 05",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59425093",
+    "_collection_link": "https://go.postman.co/collection/59425093-5ee89a4e-7aaf-45a4-8722-1aa595d1e180?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Courier Cancellation Validation Tests",
+      "item": [
+        {
+          "name": "Login as courier",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n    console.log(\"Courier Login Successfully!\")\r\n})\r\n\r\nconst courierToken = pm.response.json();\r\npm.environment.set(\"courierToken\", courierToken.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"dex\",\r\n    \"password\": \"Dex#2026\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/auth/login",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "courier GET shipments_assigned only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n})\r\n\r\npm.test(\"Courier Assigned Only\", function () {\r\n    const data = pm.response.json();\r\n\r\n    data.items.forEach((shipment) => {\r\n        pm.expect(shipment.courierId).to.eql(7);\r\n    })\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "courier GET get assigned shipment_inTransit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const shipment = pm.response.json();\r\n\r\nconsole.log(\"Shipment ID:\", shipment.id);\r\nconsole.log(\"Status before PATCH:\", shipment.status);\r\nconsole.log(\"Courier ID:\", shipment.courierId);\r\n\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Shipment is assigned to courier 7\", function () {\r\n    pm.expect(shipment.courierId).to.eql(7);\r\n});\r\n\r\npm.test(\"Shipment status is InTransit before PATCH\", function () {\r\n    pm.expect(shipment.status).to.eql(\"InTransit\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{inTransitShipmentId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{inTransitShipmentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "courier changed status to InTransit to Cancelled",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", function () {\r\n    pm.response.to.have.status(403);\r\n});\r\n\r\n// pm.test(\"Check if the error message is correct\", function () {\r\n//     pm.expect(pm.response.json().error).to.eql(\"Cannot move from PickedUp to Delivered\")\r\n// });\r\n\r\nconsole.log(\"Actual response code:\", pm.response.code);\r\nconsole.log(\"Response body:\", pm.response.text());"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"Cancelled\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{inTransitShipmentId}}/status",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{inTransitShipmentId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify InTransit shipment remains unchanged",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Shipment status remains InTransit\", function () {\r\n    const shipment = pm.response.json();\r\n    pm.expect(shipment.status).to.eql(\"InTransit\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{inTransitShipmentId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{inTransitShipmentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "courier GET get assigned shipment_delivered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const shipment = pm.response.json();\r\n\r\nconsole.log(\"Shipment ID:\", shipment.id);\r\nconsole.log(\"Status before PATCH:\", shipment.status);\r\nconsole.log(\"Courier ID:\", shipment.courierId);\r\n\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Shipment is assigned to courier 7\", function () {\r\n    pm.expect(shipment.courierId).to.eql(7);\r\n});\r\n\r\npm.test(\"Shipment status is Delivered before PATCH\", function () {\r\n    pm.expect(shipment.status).to.eql(\"Delivered\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{deliveredShipmentId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{deliveredShipmentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "courier changed status to Delivered to Cancelled",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", function () {\r\n    pm.response.to.have.status(403);\r\n});\r\n\r\nconsole.log(\"Actual response code:\", pm.response.code);\r\nconsole.log(\"Response body:\", pm.response.text());"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"Cancelled\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{deliveredShipmentId}}/status",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{deliveredShipmentId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Delivered shipment remains unchanged",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const shipment = pm.response.json();\r\n\r\nconsole.log(\"Shipment ID:\", shipment.id);\r\nconsole.log(\"Status before PATCH:\", shipment.status);\r\nconsole.log(\"Courier ID:\", shipment.courierId);\r\n\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Shipment is assigned to courier 7\", function () {\r\n    pm.expect(shipment.courierId).to.eql(7);\r\n});\r\n\r\npm.test(\"Shipment status is Delivered before PATCH\", function () {\r\n    pm.expect(shipment.status).to.eql(\"Delivered\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{deliveredShipmentId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{deliveredShipmentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "courier creates shipment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {\r\n    pm.response.to.have.status(403)\r\n})\r\npm.test(\"Check if the error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Only merchant users can create shipments\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{courierToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"recipientName\": \"Courier Shipment\",\r\n    \"city\": \"Mandaue City\",\r\n    \"weightKg\": 15.5,\r\n    \"service\": \"SameDay\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Support Testing",
+      "item": [
+        {
+          "name": "Login as support",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n    console.log(\"Support Login Successfully!\")\r\n})\r\n\r\nconst supportToken = pm.response.json();\r\npm.environment.set(\"supportToken\", supportToken.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"sam\",\r\n    \"password\": \"Sam#2026\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/auth/login",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "support GET shipments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Verify HTTP status code\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Verify response time\r\npm.test(\"Response time is less than 500ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(500);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\n// Verify shipments array exists and is not empty\r\npm.test(\"Shipments array exists and is not empty\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n});\r\n\r\n// Verify required fields for each shipment\r\npm.test(\"All shipments contain the required fields\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n\r\n    data.items.forEach(function (shipment) {\r\n        pm.expect(shipment).to.have.property('id');\r\n        pm.expect(shipment).to.have.property('merchantId');\r\n        pm.expect(shipment).to.have.property('recipientName');\r\n        pm.expect(shipment).to.have.property('city');\r\n        pm.expect(shipment).to.have.property('weightKg');\r\n        pm.expect(shipment).to.have.property('service');\r\n        pm.expect(shipment).to.have.property('feePhp');\r\n        pm.expect(shipment).to.have.property('status');\r\n        pm.expect(shipment).to.have.property('courierId');\r\n        pm.expect(shipment).to.have.property('createdAt');\r\n        pm.expect(shipment).to.have.property('updatedAt');\r\n    });\r\n});\r\n\r\nconsole.log(data);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supportToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "support creates shipment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {\r\n    pm.response.to.have.status(403)\r\n})\r\npm.test(\"Check if the error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Only merchant users can create shipments\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supportToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"recipientName\": \"Support Shipment\",\r\n    \"city\": \"Davao City\",\r\n    \"weightKg\": 20.5,\r\n    \"service\": \"Express\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "support changes Merchant A shipment status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {\r\n    pm.response.to.have.status(403)\r\n})\r\npm.test(\"Check if the error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Cannot move from PickedUp to Delivered\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supportToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"Delivered\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/1003/status",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "1003",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Merchant Admin Tests",
+      "item": [
+        {
+          "name": "Invalid Status Transition Tests",
+          "item": [
+            {
+              "name": "Login as merchant_admin",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n    console.log(\"Merchant Admin Login Successfully!\")\r\n})\r\n\r\nconst merchantAdminToken = pm.response.json();\r\npm.environment.set(\"merchantAdminToken\", merchantAdminToken.token);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"ana\",\r\n    \"password\": \"Ana#2026\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseurl}}/auth/login",
+                  "host": [
+                    "{{baseurl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "(merchant admin) Setup - Create shipment for invalid status transition",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 403\", function () {\r\n    pm.response.to.have.status(403)\r\n})\r\npm.test(\"Check if the error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Only merchant users can create shipments\")\r\n})"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{courierToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"recipientName\": \"Courier Shipment\",\r\n    \"city\": \"Mandaue City\",\r\n    \"weightKg\": 15.5,\r\n    \"service\": \"SameDay\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseurl}}/shipments",
+                  "host": [
+                    "{{baseurl}}"
+                  ],
+                  "path": [
+                    "shipments"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "(merchant admin) Setup - Set shipment status to PickedUp",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 409\", function () {\r\n    pm.response.to.have.status(409)\r\n})\r\npm.test(\"Check if the error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Cannot move from PickedUp to Delivered\")\r\n})"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{supportToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"status\": \"Delivered\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseurl}}/shipments/1007/status",
+                  "host": [
+                    "{{baseurl}}"
+                  ],
+                  "path": [
+                    "shipments",
+                    "1007",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "(merchant admin) Setup - Verify shipment is PickedUp",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const shipment = pm.response.json();\r\n\r\nconsole.log(\"Shipment ID:\", shipment.id);\r\nconsole.log(\"Status before PATCH:\", shipment.status);\r\n\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Precondition - Shipment status is PickedUp\", function () {\r\n    pm.expect(shipment.status).to.eql(\"PickedUp\");\r\n});\r\n\r\nif (pm.response.code !== 200 || shipment.status !== \"PickedUp\") {\r\n    console.error(\"Precondition failed. Stopping collection run.\");\r\n    pm.execution.setNextRequest(null);\r\n}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{merchantAdminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseurl}}/shipments/{{transitionShipmentId}}",
+                  "host": [
+                    "{{baseurl}}"
+                  ],
+                  "path": [
+                    "shipments",
+                    "{{transitionShipmentId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "disallowed status move_PickedUp to Delivered",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 409\", function () {\r\n    pm.response.to.have.status(409)\r\n})\r\npm.test(\"Check if the error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Cannot move from PickedUp to Delivered\")\r\n})"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{merchantAdminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"status\": \"Delivered\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseurl}}/shipments/{{transitionShipmentId}}/status",
+                  "host": [
+                    "{{baseurl}}"
+                  ],
+                  "path": [
+                    "shipments",
+                    "{{transitionShipmentId}}",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "(merchant admin) Verify shipment remains PickedUp",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const shipment = pm.response.json();\r\n\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Shipment status remains PickedUp\", function () {\r\n    pm.expect(shipment.status).to.eql(\"PickedUp\");\r\n});\r\n\r\nconsole.log(\"Shipment ID:\", shipment.id);\r\nconsole.log(\"Status after PATCH:\", shipment.status);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{merchantAdminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseurl}}/shipments/{{transitionShipmentId}}",
+                  "host": [
+                    "{{baseurl}}"
+                  ],
+                  "path": [
+                    "shipments",
+                    "{{transitionShipmentId}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "merchant_admin 1 GET shipments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Verify HTTP status code\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Verify response time\r\npm.test(\"Response time is less than 500ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(500);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\n// Verify shipments array exists and is not empty\r\npm.test(\"Shipments array exists and is not empty\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n});\r\n\r\n// Verify required fields for each shipment\r\npm.test(\"All shipments contain the required fields\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n\r\n    data.items.forEach(function (shipment) {\r\n        pm.expect(shipment).to.have.property('id');\r\n        pm.expect(shipment).to.have.property('merchantId');\r\n        pm.expect(shipment).to.have.property('recipientName');\r\n        pm.expect(shipment).to.have.property('city');\r\n        pm.expect(shipment).to.have.property('weightKg');\r\n        pm.expect(shipment).to.have.property('service');\r\n        pm.expect(shipment).to.have.property('feePhp');\r\n        pm.expect(shipment).to.have.property('status');\r\n        pm.expect(shipment).to.have.property('courierId');\r\n        pm.expect(shipment).to.have.property('createdAt');\r\n        pm.expect(shipment).to.have.property('updatedAt');\r\n    });\r\n});\r\n\r\nconsole.log(data);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Merchant Staff Tests",
+      "item": [
+        {
+          "name": "Login as merchant_staff",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n    console.log(\"Merchant Staff Login Successfully!\")\r\n})\r\n\r\nconst merchantStaffToken = pm.response.json();\r\npm.environment.set(\"merchantStaffToken\", merchantStaffToken.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"ben\",\r\n    \"password\": \"Ben#2026\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/auth/login",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "merchant_staff GET shipments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Verify HTTP status code\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Verify response time\r\npm.test(\"Response time is less than 500ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(500);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\n// Verify shipments array exists and is not empty\r\npm.test(\"Shipments array exists and is not empty\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n});\r\n\r\n// Verify required fields for each shipment\r\npm.test(\"All shipments contain the required fields\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n\r\n    data.items.forEach(function (shipment) {\r\n        pm.expect(shipment).to.have.property('id');\r\n        pm.expect(shipment).to.have.property('merchantId');\r\n        pm.expect(shipment).to.have.property('recipientName');\r\n        pm.expect(shipment).to.have.property('city');\r\n        pm.expect(shipment).to.have.property('weightKg');\r\n        pm.expect(shipment).to.have.property('service');\r\n        pm.expect(shipment).to.have.property('feePhp');\r\n        pm.expect(shipment).to.have.property('status');\r\n        pm.expect(shipment).to.have.property('courierId');\r\n        pm.expect(shipment).to.have.property('createdAt');\r\n        pm.expect(shipment).to.have.property('updatedAt');\r\n    });\r\n});\r\n\r\nconsole.log(data);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "merchant_staff reads another merchant's shipment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Merchant Staff Cannot See Another Mechant's Shipment\", function () {\r\n    pm.response.to.have.status(404);\r\n})\r\n\r\npm.test(\"Error Message is Correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Shipment not found\");\r\n})\r\n\r\npm.test(\"Response time is less than 200ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(200);\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/1007",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "1007"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "merchant_staff adds new shipment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n})\n\npm.test(\"Return Shipment Fields\", function () {\n    const shipment = pm.response.json();\n    pm.expect(shipment).to.have.property('id');\n    pm.expect(shipment).to.have.property('merchantId');\n    pm.expect(shipment).to.have.property('recipientName');\n    pm.expect(shipment).to.have.property('city');\n    pm.expect(shipment).to.have.property('weightKg');\n    pm.expect(shipment).to.have.property('service');\n    pm.expect(shipment).to.have.property('feePhp');\n    pm.expect(shipment).to.have.property('status');\n    pm.expect(shipment).to.have.property('courierId');\n    pm.expect(shipment).to.have.property('createdAt');\n    pm.expect(shipment).to.have.property('updatedAt'); \n    console.log(shipment)\n})\n\npm.test(\"Check Created Shipment\", function () {\n    const shipment = pm.response.json();\n    pm.expect(shipment.status).to.eql('Created');\n    pm.collectionVariables.set(\"shipmentId\", shipment.id); // Store shipmentId in collection variables for future use \n})\n\npm.test(\"Response time is less than 200ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(200);\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"recipientName\": \"Staff Shipment 2\",\r\n    \"city\": \"Cebu City\",\r\n    \"weightKg\": 20,\r\n    \"service\": \"Standard\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "merchant_staff GET its own shipment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{shipmentId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{shipmentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Below minimum (0.05 kg) weightKg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains an error\", function () {\r",
+                  "    const data = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(data).to.have.property(\"error\");\r",
+                  "    pm.expect(data.error).to.be.a(\"string\").and.not.empty;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Weight validation error is returned\", function () {\r",
+                  "    const data = pm.response.json();\r",
+                  "    const errorDetails = JSON.stringify(data);\r",
+                  "\r",
+                  "    pm.expect(errorDetails).to.include(\"weightKg\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"recipientName\": \"Ashley\",\r\n  \"city\": \"Davao City\",\r\n  \"weightKg\": 0.05,\r\n  \"service\": \"Standard\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Above maximum (30.01 kg) weightKg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains an error\", function () {\r",
+                  "    const data = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(data).to.have.property(\"error\");\r",
+                  "    pm.expect(data.error).to.be.a(\"string\").and.not.empty;\r",
+                  "    pm.expect(data.error).to.equal(\"weightKg must be between 0.1 and 30\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Weight validation error is returned\", function () {\r",
+                  "    const data = pm.response.json();\r",
+                  "    const errorDetails = JSON.stringify(data);\r",
+                  "\r",
+                  "    pm.expect(errorDetails).to.include(\"weightKg\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"recipientName\": \"Gregg\",\r\n  \"city\": \"Cebu City\",\r\n  \"weightKg\": 30.01,\r\n  \"service\": \"Standard\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Minimum valid (0.1 kg) weightKg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Return Shipment Fields\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(shipment).to.have.property(\"id\");\r",
+                  "    pm.expect(shipment).to.have.property(\"merchantId\");\r",
+                  "    pm.expect(shipment).to.have.property(\"recipientName\");\r",
+                  "    pm.expect(shipment).to.have.property(\"city\");\r",
+                  "    pm.expect(shipment).to.have.property(\"weightKg\");\r",
+                  "    pm.expect(shipment).to.have.property(\"service\");\r",
+                  "    pm.expect(shipment).to.have.property(\"feePhp\");\r",
+                  "    pm.expect(shipment).to.have.property(\"status\");\r",
+                  "    pm.expect(shipment).to.have.property(\"courierId\");\r",
+                  "    pm.expect(shipment).to.have.property(\"createdAt\");\r",
+                  "    pm.expect(shipment).to.have.property(\"updatedAt\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created shipment matches POST request\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    const requestData = JSON.parse(\r",
+                  "        pm.variables.replaceIn(pm.request.body.raw)\r",
+                  "    );\r",
+                  "\r",
+                  "    pm.expect(shipment.recipientName)\r",
+                  "        .to.equal(requestData.recipientName);\r",
+                  "\r",
+                  "    pm.expect(shipment.city)\r",
+                  "        .to.equal(requestData.city);\r",
+                  "\r",
+                  "    pm.expect(shipment.weightKg)\r",
+                  "        .to.equal(requestData.weightKg);\r",
+                  "\r",
+                  "    pm.expect(shipment.service)\r",
+                  "        .to.equal(requestData.service);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Shipment status is Created\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(shipment.status).to.equal(\"Created\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Standard service base fee is PHP 120\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(shipment.feePhp).to.equal(120);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"recipientName\": \"Simon\",\r\n  \"city\": \"Lapu Lapu City\",\r\n  \"weightKg\": 0.1,\r\n  \"service\": \"Standard\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Maximum valid (30 kg) weightKg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Return Shipment Fields\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(shipment).to.have.property(\"id\");\r",
+                  "    pm.expect(shipment).to.have.property(\"merchantId\");\r",
+                  "    pm.expect(shipment).to.have.property(\"recipientName\");\r",
+                  "    pm.expect(shipment).to.have.property(\"city\");\r",
+                  "    pm.expect(shipment).to.have.property(\"weightKg\");\r",
+                  "    pm.expect(shipment).to.have.property(\"service\");\r",
+                  "    pm.expect(shipment).to.have.property(\"feePhp\");\r",
+                  "    pm.expect(shipment).to.have.property(\"status\");\r",
+                  "    pm.expect(shipment).to.have.property(\"courierId\");\r",
+                  "    pm.expect(shipment).to.have.property(\"createdAt\");\r",
+                  "    pm.expect(shipment).to.have.property(\"updatedAt\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created shipment matches POST request\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    const requestData = JSON.parse(\r",
+                  "        pm.variables.replaceIn(pm.request.body.raw)\r",
+                  "    );\r",
+                  "\r",
+                  "    pm.expect(shipment.recipientName)\r",
+                  "        .to.equal(requestData.recipientName);\r",
+                  "\r",
+                  "    pm.expect(shipment.city)\r",
+                  "        .to.equal(requestData.city);\r",
+                  "\r",
+                  "    pm.expect(shipment.weightKg)\r",
+                  "        .to.equal(requestData.weightKg);\r",
+                  "\r",
+                  "    pm.expect(shipment.service)\r",
+                  "        .to.equal(requestData.service);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Shipment status is Created\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(shipment.status).to.equal(\"Created\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Standard service base fee is PHP 120\", function () {\r",
+                  "    const shipment = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(shipment.feePhp).to.equal(120);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"recipientName\": \"Simon\",\r\n  \"city\": \"Lapu Lapu City\",\r\n  \"weightKg\": 0.1,\r\n  \"service\": \"Standard\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create shipment - Missing recipientName",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r\n    pm.response.to.have.status(400);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"city\": \"Cebu City\",\r\n    \"weightKg\": 5,\r\n    \"service\": \"Standard\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create shipment - Invalid service Overnight",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r\n    pm.response.to.have.status(400);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"recipientName\": \"Test Recipient\",\r\n    \"city\": \"Cebu City\",\r\n    \"weightKg\": 5,\r\n    \"service\": \"Overnight\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create shipment - SameDay to Davao City",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 422 Unprocessable Entity\", function () {\r\n    pm.response.to.have.status(422);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"recipientName\": \"Test Test\",\r\n    \"city\": \"Davao City\",\r\n    \"weightKg\": 5,\r\n    \"service\": \"SameDay\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unknown status value - Lost",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r\n    pm.response.to.have.status(400);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{merchantStaffToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"Lost\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/shipments/{{shipmentId}}/status",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "shipments",
+                "{{shipmentId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Missing Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+              "    pm.response.to.have.status(401);\r",
+              "})\r",
+              "\r",
+              "pm.test(\"Response body contains error message\", function () {\r",
+              "    pm.expect(pm.response.json().error).to.eql(\"Missing token\");\r",
+              "})"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseurl}}/shipments",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 401 Forbidden\", function () {\r\n    pm.response.to.have.status(401);\r\n})\r\n\r\npm.test(\"Response body contains error message\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Invalid token\");\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_0nnt}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseurl}}/shipments",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login as merchant_admin 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n    console.log(\"Merchant Admin Login Successfully!\")\r\n})\r\n\r\nconst merchantAdmin2Token = pm.response.json();\r\npm.environment.set(\"merchantAdmin2Token\", merchantAdmin2Token.token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"cara\",\r\n    \"password\": \"Cara#2026\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/auth/login",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "merchant_admin_2 GET shipments",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Verify HTTP status code\r\npm.test(\"Status code is 200 OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Verify response time\r\npm.test(\"Response time is less than 500ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(500);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\n// Verify shipments array exists and is not empty\r\npm.test(\"Shipments array exists and is not empty\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n});\r\n\r\n// Verify required fields for each shipment\r\npm.test(\"All shipments contain the required fields\", function () {\r\n    pm.expect(data.items).to.be.an('array').that.is.not.empty;\r\n\r\n    data.items.forEach(function (shipment) {\r\n        pm.expect(shipment).to.have.property('id');\r\n        pm.expect(shipment).to.have.property('merchantId');\r\n        pm.expect(shipment).to.have.property('recipientName');\r\n        pm.expect(shipment).to.have.property('city');\r\n        pm.expect(shipment).to.have.property('weightKg');\r\n        pm.expect(shipment).to.have.property('service');\r\n        pm.expect(shipment).to.have.property('feePhp');\r\n        pm.expect(shipment).to.have.property('status');\r\n        pm.expect(shipment).to.have.property('courierId');\r\n        pm.expect(shipment).to.have.property('createdAt');\r\n        pm.expect(shipment).to.have.property('updatedAt');\r\n    });\r\n});\r\n\r\nconsole.log(data);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{merchantAdmin2Token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseurl}}/shipments",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "merchant_admin 2 reads another merchant's shipment",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Merchant Admin Cannot See Another Mechant's Shipment\", function () {\r\n    pm.response.to.have.status(404);\r\n})\r\n\r\npm.test(\"Error Message Shipment not found\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Shipment not found\");\r\n})\r\n\r\npm.test(\"Response time is less than 200ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.below(200);\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{merchantAdminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/shipments/1007",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments",
+            "1007"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Cancelled back to InTransit",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status update error status is 409 Conflict\", function () {\r\n    pm.response.to.have.status(409)\r\n})\r\n\r\npm.test(\"Status update error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Cannot move from Cancelled to InTransit\")\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{merchantAdmin2Token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"InTransit\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/shipments/1010/status",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments",
+            "1010",
+            "status"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Change Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status changed to PickedUp\", function () {",
+              "    const shipment = pm.response.json();",
+              "",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(shipment.status).to.equal(\"PickedUp\");",
+              "",
+              "    pm.collectionVariables.set(\"patchedShipmentId\", shipment.id);",
+              "    pm.collectionVariables.set(\"patchedUpdatedAt\", shipment.updatedAt);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{merchantAdminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"PickedUp\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/shipments/{{shipmentId}}/status",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments",
+            "{{shipmentId}}",
+            "status"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Shipment after PATCH",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Confirms shipment status update\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "\r",
+              "    const shipment = pm.response.json();\r",
+              "    const patchedShipmentId = pm.collectionVariables.get(\"patchedShipmentId\");\r",
+              "    const patchedUpdatedAt = pm.collectionVariables.get(\"patchedUpdatedAt\");\r",
+              "\r",
+              "    pm.expect(String(shipment.id)).to.equal(String(patchedShipmentId));\r",
+              "    pm.expect(shipment.status).to.equal(\"PickedUp\");\r",
+              "    pm.expect(shipment.updatedAt).to.equal(patchedUpdatedAt);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{merchantAdminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/shipments/{{shipmentId}}",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments",
+            "{{shipmentId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "disallowed status move",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status update error status is 409 Conflict\", function () {\r\n    pm.response.to.have.status(409)\r\n})\r\n\r\npm.test(\"Status update error message is correct\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Cannot move from Delivered to PickedUp\")\r\n})"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{merchantAdmin2Token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"InTransit\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/shipments/1003/status",
+          "host": [
+            "{{baseurl}}"
+          ],
+          "path": [
+            "shipments",
+            "1003",
+            "status"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_secret_0nnt",
+      "secret": true
+    },
+    {
+      "key": "shipmentId",
+      "value": ""
+    },
+    {
+      "key": "patchedShipmentId",
+      "value": ""
+    },
+    {
+      "key": "patchedUpdatedAt",
+      "value": ""
+    },
+    {
+      "key": "baseurl",
+      "value": ""
+    },
+    {
+      "key": "inTransitShipmentId",
+      "value": ""
+    },
+    {
+      "key": "deliveredShipmentId",
+      "value": ""
+    },
+    {
+      "key": "transitionShipmentId",
+      "value": ""
+    }
+  ]
+}
